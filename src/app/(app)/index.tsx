@@ -2,6 +2,7 @@ import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import DateHeader from '@/components/DateHeader';
+import AppLogo from '@/components/AppLogo';
 import { useSession } from '@/hooks/useSession';
 import { useProfile } from '@/hooks/useProfile';
 
@@ -19,17 +20,20 @@ export default function FeedScreen() {
       <DateHeader />
       <ScrollView className="flex-1" contentContainerClassName="px-4 pt-4 pb-8">
         {/* Greeting */}
-        <View className="bg-primary/5 border border-border rounded-3xl p-5 mb-4">
-          <Text className="text-2xl font-black text-foreground">
-            Assalam-o-Alaikum,{' '}
-            <Text className="text-primary">
-              {profile?.name?.split(' ')[0] ?? session?.user?.email?.split('@')[0] ?? 'Friend'}
+        <View className="bg-primary/5 border border-border rounded-3xl p-5 mb-4 flex-row items-center gap-3">
+          <AppLogo size={48} />
+          <View className="flex-1">
+            <Text className="text-xl font-black text-foreground">
+              Assalam-o-Alaikum,{' '}
+              <Text className="text-primary">
+                {profile?.name?.split(' ')[0] ?? session?.user?.email?.split('@')[0] ?? 'Friend'}
+              </Text>
+              !
             </Text>
-            !
-          </Text>
-          <Text className="text-xs text-muted-foreground mt-1 font-semibold">
-            Native beta — Sprint 12 in progress
-          </Text>
+            <Text className="text-xs text-muted-foreground mt-1 font-semibold">
+              Native beta — Sprint 12 in progress
+            </Text>
+          </View>
         </View>
 
         {/* Status card confirming plumbing works */}

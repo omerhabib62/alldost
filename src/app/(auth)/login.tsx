@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, useRouter } from 'expo-router';
 
+import AppLogo from '@/components/AppLogo';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
@@ -38,6 +39,7 @@ export default function LoginScreen() {
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.hero}>
+          <AppLogo size={64} />
           <ThemedText type="title" style={styles.brand}>ALLDost</ThemedText>
           <ThemedText type="small" style={styles.tag}>
             Log your matches, PRs, workouts. Share with your crew.
