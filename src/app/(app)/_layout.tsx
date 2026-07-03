@@ -1,35 +1,25 @@
 import { Tabs } from 'expo-router';
 import { Text } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import CustomTabBar from '@/components/CustomTabBar';
 
 /**
- * 4-tab main app. Icons are text emoji for Sprint 11 seed —
- * Sprint 12 swaps in proper icons via lucide-react-native.
+ * 4 tabs with a raised center ALLDost logo button for Chat.
+ * Layout:  [Feed]  [Diary]   ⦿LOGO⦿   [Crews]  [Profile]
  *
- * Tabs mirror the wedge: Feed · Log · Crews · Me.
- *
- * SafeArea handling: Android gesture / navigation bar sits at screen
- * bottom and covers the tab bar without this padding. useSafeAreaInsets
- * gives us the actual inset — respected on Android + iOS + web.
+ * Order of Tabs.Screen entries matters — CustomTabBar splits routes
+ * around the center: indices 0-1 (Feed, Diary) on left, 2-3 (Crews,
+ * Profile) on right.
  */
 function TabEmoji({ emoji }: { emoji: string }) {
   return <Text style={{ fontSize: 18 }}>{emoji}</Text>;
 }
 
 export default function AppLayout() {
-  const insets = useSafeAreaInsets();
-
   return (
     <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarStyle: {
-          height: 62 + insets.bottom,
-          paddingBottom: 8 + insets.bottom,
-          paddingTop: 8,
-        },
-        tabBarLabelStyle: { fontSize: 11, fontWeight: '800' },
-      }}
+      screenOptions={{ headerShown: false }}
+      tabBar={(props) => <CustomTabBar {...props} />}
     >
       <Tabs.Screen
         name="index"
