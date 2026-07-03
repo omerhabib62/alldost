@@ -1,7 +1,7 @@
 import { ScrollView, Text, View, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Trophy, Flame, Dumbbell, UtensilsCrossed, Users, PlusCircle } from 'lucide-react-native';
+import { Trophy, Flame, Dumbbell, UtensilsCrossed, Users, MessageSquareText } from 'lucide-react-native';
 
 import DateHeader from '@/components/DateHeader';
 import AppLogo from '@/components/AppLogo';
@@ -106,9 +106,11 @@ export default function FeedScreen() {
         </Text>
       </ScrollView>
 
-      {/* Floating add button — one tap to Log screen */}
+      {/* Floating chat button — one tap to open ALLDost conversational
+          logging (Kalorist parallel: KalCoach button). Separate from
+          the Diary tab; quick add via natural language. */}
       <Pressable
-        onPress={() => router.push('/(app)/log' as any)}
+        onPress={() => router.push('/chat' as any)}
         className="absolute bottom-24 right-5 w-14 h-14 rounded-full bg-primary items-center justify-center"
         style={{
           shadowColor: '#0a66c2',
@@ -117,9 +119,9 @@ export default function FeedScreen() {
           shadowRadius: 8,
           elevation: 8,
         }}
-        accessibilityLabel="Add a log entry"
+        accessibilityLabel="Talk to ALLDost"
       >
-        <PlusCircle size={26} color="#fff" />
+        <MessageSquareText size={26} color="#fff" />
       </Pressable>
     </SafeAreaView>
   );

@@ -37,7 +37,7 @@ export default function AppLayout() {
       />
       <Tabs.Screen
         name="log"
-        options={{ title: 'Log', tabBarIcon: () => <TabEmoji emoji="➕" /> }}
+        options={{ title: 'Diary', tabBarIcon: () => <TabEmoji emoji="📓" /> }}
       />
       <Tabs.Screen
         name="squads"
