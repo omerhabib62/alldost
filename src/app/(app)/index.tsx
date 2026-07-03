@@ -1,41 +1,64 @@
-import { StyleSheet, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Spacing } from '@/constants/theme';
+import DateHeader from '@/components/DateHeader';
 import { useSession } from '@/hooks/useSession';
+import { useProfile } from '@/hooks/useProfile';
 
 /**
- * Sprint 11 STUB — Feed tab. Sprint 14 replaces this with the actual squad
- * activity feed (merged log across your crews, most recent first).
+ * Sprint 12 in-flight — Feed screen doubles as the daily dashboard for
+ * now (real Feed = merged squad activity in Sprint 14). Currently proves
+ * NativeWind + DateHeader + useProfile all working end-to-end.
  */
 export default function FeedScreen() {
   const { session } = useSession();
+  const { data: profile } = useProfile();
+
   return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedText type="title" style={styles.title}>Feed</ThemedText>
-        <View style={styles.empty}>
-          <ThemedText type="small" style={styles.emptyText}>
-            Nothing here yet. Once you and your crew log activities, they show up here.
-          </ThemedText>
-          {session && (
-            <ThemedText type="small" style={styles.signedInAs}>
-              Signed in as {session.user.email}
-            </ThemedText>
-          )}
+    <SafeAreaView className="flex-1 bg-background">
+      <DateHeader />
+      <ScrollView className="flex-1" contentContainerClassName="px-4 pt-4 pb-8">
+        {/* Greeting */}
+        <View className="bg-primary/5 border border-border rounded-3xl p-5 mb-4">
+          <Text className="text-2xl font-black text-foreground">
+            Assalam-o-Alaikum,{' '}
+            <Text className="text-primary">
+              {profile?.name?.split(' ')[0] ?? session?.user?.email?.split('@')[0] ?? 'Friend'}
+            </Text>
+            !
+          </Text>
+          <Text className="text-xs text-muted-foreground mt-1 font-semibold">
+            Native beta — Sprint 12 in progress
+          </Text>
         </View>
-      </SafeAreaView>
-    </ThemedView>
+
+        {/* Status card confirming plumbing works */}
+        <View className="bg-card border border-border rounded-2xl p-4 gap-2">
+          <StatusRow label="Session" value={session ? '✓ signed in' : '—'} ok={!!session} />
+          <StatusRow label="Profile" value={profile?.name ?? '—'} ok={!!profile?.name} />
+          <StatusRow
+            label="Onboarded"
+            value={profile ? (profile.needs_onboarding ? 'needs onboarding' : '✓') : '—'}
+            ok={!!profile && !profile.needs_onboarding}
+          />
+          <StatusRow label="Role" value={profile?.role ?? 'user'} ok />
+        </View>
+
+        <Text className="text-[10px] text-muted-foreground/60 text-center mt-6 uppercase tracking-widest font-black">
+          Sprint 12 · v0.0.2 · 03 Jul 2026
+        </Text>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  safeArea: { flex: 1, paddingHorizontal: Spacing.four, paddingTop: Spacing.four },
-  title: { fontSize: 28, fontWeight: '900' },
-  empty: { marginTop: Spacing.six, gap: Spacing.two, alignItems: 'center' },
-  emptyText: { opacity: 0.6, textAlign: 'center', maxWidth: 300 },
-  signedInAs: { opacity: 0.4, marginTop: Spacing.three },
-});
+function StatusRow({ label, value, ok }: { label: string; value: string; ok: boolean }) {
+  return (
+    <View className="flex-row justify-between items-center">
+      <Text className="text-xs text-muted-foreground">{label}</Text>
+      <Text className={`text-xs font-black ${ok ? 'text-primary' : 'text-destructive'}`}>
+        {value}
+      </Text>
+    </View>
+  );
+}
