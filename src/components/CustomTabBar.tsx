@@ -1,11 +1,15 @@
 /**
- * CustomTabBar — bottom nav with 4 tabs + a raised center ALLDost logo
+ * CustomTabBar — bottom nav with 4 tabs + a center ALLDost logo button
  * that opens the chat modal.
  *
  * Layout:  [Feed]  [Diary]   ⦿LOGO⦿   [Crews]  [Profile]
  *
- * The center logo is NOT a tab route — it's a Pressable that pushes /chat.
- * Same pattern as Instagram's + button, Snapchat's camera, etc.
+ * Center logo: NOT a tab route — a Pressable that pushes /chat.
+ * Sized to fit within the tab bar area (no white backdrop, no
+ * over-flowing offset). Same pattern as Instagram + / Snapchat camera.
+ *
+ * Active tab indication: colored top-stripe over the active tab + label
+ * and icon color shift. Removes ambiguity about which screen is current.
  */
 
 import { View, Text, Pressable } from 'react-native';
@@ -15,52 +19,38 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import AppLogo from '@/components/AppLogo';
 
+const ACTIVE_COLOR = '#0a66c2';
+const INACTIVE_COLOR = '#9ca3af';
+
 export default function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
-  // Split visible tabs around the center logo. We render tab index 0-1 on
-  // the left, 2-3 on the right, and the logo Pressable in the middle.
-  const routes = state.routes;
-
   return (
     <View
       className="flex-row bg-card border-t border-border"
-      style={{ paddingBottom: insets.bottom, height: 62 + insets.bottom }}
+      style={{ paddingBottom: insets.bottom, height: 64 + insets.bottom }}
     >
-      {/* Left cluster — tabs 0 and 1 */}
+      {/* Left cluster */}
       <TabButton state={state} descriptors={descriptors} navigation={navigation} routeIndex={0} />
       <TabButton state={state} descriptors={descriptors} navigation={navigation} routeIndex={1} />
 
-      {/* Center — raised ALLDost logo button opening /chat */}
-      <View className="flex-1 items-center justify-start">
+      {/* Center — ALLDost logo → /chat. No backdrop, fits inside bar. */}
+      <View className="flex-1 items-center justify-center">
         <Pressable
           onPress={() => router.push('/chat' as any)}
           className="items-center justify-center"
-          style={{
-            marginTop: -18,
-            width: 62,
-            height: 62,
-            borderRadius: 31,
-            backgroundColor: 'white',
-            alignItems: 'center',
-            justifyContent: 'center',
-            shadowColor: '#0a66c2',
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.25,
-            shadowRadius: 8,
-            elevation: 10,
-          }}
           accessibilityLabel="Talk to ALLDost"
+          hitSlop={12}
         >
-          <AppLogo size={54} />
+          <AppLogo size={44} />
+          <Text className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mt-1">
+            Chat
+          </Text>
         </Pressable>
-        <Text className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mt-1">
-          Chat
-        </Text>
       </View>
 
-      {/* Right cluster — tabs 2 and 3 */}
+      {/* Right cluster */}
       <TabButton state={state} descriptors={descriptors} navigation={navigation} routeIndex={2} />
       <TabButton state={state} descriptors={descriptors} navigation={navigation} routeIndex={3} />
     </View>
@@ -104,10 +94,22 @@ function TabButton({
       accessibilityState={isFocused ? { selected: true } : {}}
       accessibilityLabel={label}
     >
+      {/* Active-tab top stripe — visible marker of current screen */}
+      <View
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: '20%',
+          right: '20%',
+          height: 3,
+          borderRadius: 2,
+          backgroundColor: isFocused ? ACTIVE_COLOR : 'transparent',
+        }}
+      />
       {options.tabBarIcon &&
         options.tabBarIcon({
           focused: isFocused,
-          color: isFocused ? '#0a66c2' : '#9ca3af',
+          color: isFocused ? ACTIVE_COLOR : INACTIVE_COLOR,
           size: 20,
         })}
       <Text

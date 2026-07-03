@@ -4,7 +4,6 @@ import { useRouter } from 'expo-router';
 import { Trophy, Flame, Dumbbell, UtensilsCrossed, Users } from 'lucide-react-native';
 
 import DateHeader from '@/components/DateHeader';
-import AppLogo from '@/components/AppLogo';
 import { useSession } from '@/hooks/useSession';
 import { useProfile } from '@/hooks/useProfile';
 
@@ -25,18 +24,7 @@ export default function FeedScreen() {
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top']}>
       <DateHeader />
-      <ScrollView className="flex-1" contentContainerClassName="px-4 pt-4 pb-8">
-        {/* Header row */}
-        <View className="flex-row items-center justify-between mb-4">
-          <View className="flex-row items-center gap-2">
-            <AppLogo size={32} />
-            <Text className="text-xl font-black text-foreground">Feed</Text>
-          </View>
-          <Text className="text-[11px] text-muted-foreground font-semibold">
-            Your crew's activity
-          </Text>
-        </View>
-
+      <ScrollView className="flex-1" contentContainerClassName="px-4 pt-3 pb-8">
         {/* Empty state hero */}
         <View className="bg-primary/5 border border-border rounded-3xl p-5 items-center mb-4">
           <View className="w-14 h-14 rounded-2xl bg-primary/10 items-center justify-center mb-3">
