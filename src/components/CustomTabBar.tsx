@@ -35,7 +35,7 @@ export default function CustomTabBar({ state, descriptors, navigation }: BottomT
       <TabButton state={state} descriptors={descriptors} navigation={navigation} routeIndex={0} />
       <TabButton state={state} descriptors={descriptors} navigation={navigation} routeIndex={1} />
 
-      {/* Center — ALLDost logo → /chat. No backdrop, fits inside bar. */}
+      {/* Center — circular ALLDost logo → /chat. */}
       <View className="flex-1 items-center justify-center">
         <Pressable
           onPress={() => router.push('/chat' as any)}
@@ -43,7 +43,7 @@ export default function CustomTabBar({ state, descriptors, navigation }: BottomT
           accessibilityLabel="Talk to ALLDost"
           hitSlop={12}
         >
-          <AppLogo size={44} />
+          <AppLogo size={44} radiusRatio={0.5} />
           <Text className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mt-1">
             Chat
           </Text>
@@ -89,34 +89,48 @@ function TabButton({
   return (
     <Pressable
       onPress={onPress}
-      className="flex-1 items-center justify-center py-2"
+      className="flex-1 items-center justify-center py-1.5"
       accessibilityRole="button"
       accessibilityState={isFocused ? { selected: true } : {}}
       accessibilityLabel={label}
     >
-      {/* Active-tab top stripe — visible marker of current screen */}
+      {/* Active-tab top stripe — thicker/wider so it reads as a clear
+          selection marker. */}
       <View
         style={{
           position: 'absolute',
           top: 0,
-          left: '20%',
-          right: '20%',
-          height: 3,
+          left: '15%',
+          right: '15%',
+          height: 4,
           borderRadius: 2,
           backgroundColor: isFocused ? ACTIVE_COLOR : 'transparent',
         }}
       />
-      {options.tabBarIcon &&
-        options.tabBarIcon({
-          focused: isFocused,
-          color: isFocused ? ACTIVE_COLOR : INACTIVE_COLOR,
-          size: 20,
-        })}
-      <Text
-        className={`text-[10px] font-black mt-0.5 ${isFocused ? 'text-primary' : 'text-muted-foreground'}`}
+      {/* Rounded pill background under the active tab — makes the state
+          unambiguous. Inactive tabs stay flat. */}
+      <View
+        style={{
+          alignItems: 'center',
+          justifyContent: 'center',
+          paddingVertical: 4,
+          paddingHorizontal: 12,
+          borderRadius: 14,
+          backgroundColor: isFocused ? 'rgba(10,102,194,0.10)' : 'transparent',
+        }}
       >
-        {label}
-      </Text>
+        {options.tabBarIcon &&
+          options.tabBarIcon({
+            focused: isFocused,
+            color: isFocused ? ACTIVE_COLOR : INACTIVE_COLOR,
+            size: 20,
+          })}
+        <Text
+          className={`text-[10px] font-black mt-0.5 ${isFocused ? 'text-primary' : 'text-muted-foreground'}`}
+        >
+          {label}
+        </Text>
+      </View>
     </Pressable>
   );
 }
