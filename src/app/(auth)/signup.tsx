@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Alert, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, useRouter } from 'expo-router';
 
@@ -12,15 +12,19 @@ export default function SignupScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [infoMsg, setInfoMsg] = useState<string | null>(null);
   const router = useRouter();
 
   const onSubmit = async () => {
+    setErrorMsg(null);
+    setInfoMsg(null);
     if (!email.trim() || !password) {
-      Alert.alert('Missing info', 'Enter your email and password.');
+      setErrorMsg('Enter your email and password.');
       return;
     }
     if (password.length < 8) {
-      Alert.alert('Weak password', 'Use at least 8 characters.');
+      setErrorMsg('Password must be at least 8 characters.');
       return;
     }
     setSubmitting(true);
@@ -31,19 +35,13 @@ export default function SignupScreen() {
     setSubmitting(false);
 
     if (error) {
-      Alert.alert('Signup failed', error.message);
+      setErrorMsg(error.message);
       return;
     }
     if (!data.session) {
-      // Email confirmation is enabled in Supabase — user must confirm before session issues.
-      Alert.alert(
-        'Almost there',
-        'Check your email to confirm your account, then sign in.'
-      );
-      router.replace('/(auth)/login');
+      setInfoMsg('Check your email to confirm your account, then sign in.');
       return;
     }
-    // Session issued directly (email confirmation disabled)
     router.replace('/(onboarding)/profile');
   };
 
@@ -58,10 +56,21 @@ export default function SignupScreen() {
         </View>
 
         <View style={styles.form}>
+          {errorMsg && (
+            <View style={styles.errorBanner}>
+              <ThemedText type="small" style={styles.errorText}>{errorMsg}</ThemedText>
+            </View>
+          )}
+          {infoMsg && (
+            <View style={styles.infoBanner}>
+              <ThemedText type="small" style={styles.infoText}>{infoMsg}</ThemedText>
+            </View>
+          )}
+
           <ThemedText type="small" style={styles.label}>Email</ThemedText>
           <TextInput
             value={email}
-            onChangeText={setEmail}
+            onChangeText={(v) => { setErrorMsg(null); setEmail(v); }}
             autoCapitalize="none"
             autoComplete="email"
             keyboardType="email-address"
@@ -73,7 +82,7 @@ export default function SignupScreen() {
           <ThemedText type="small" style={styles.label}>Password (8+ chars)</ThemedText>
           <TextInput
             value={password}
-            onChangeText={setPassword}
+            onChangeText={(v) => { setErrorMsg(null); setPassword(v); }}
             autoCapitalize="none"
             autoComplete="new-password"
             secureTextEntry
@@ -136,4 +145,20 @@ const styles = StyleSheet.create({
   footerRow: { flexDirection: 'row', justifyContent: 'center', gap: Spacing.two, marginTop: Spacing.three, flexWrap: 'wrap' },
   footerText: { opacity: 0.6 },
   link: { fontWeight: '700', textDecorationLine: 'underline' },
+  errorBanner: {
+    backgroundColor: '#fef2f2',
+    borderColor: '#fecaca',
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: Spacing.three,
+  },
+  errorText: { color: '#991b1b', fontWeight: '600' },
+  infoBanner: {
+    backgroundColor: '#eff6ff',
+    borderColor: '#bfdbfe',
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: Spacing.three,
+  },
+  infoText: { color: '#1e40af', fontWeight: '600' },
 });

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Alert, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, useRouter } from 'expo-router';
 
@@ -12,11 +12,13 @@ export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const router = useRouter();
 
   const onSubmit = async () => {
+    setErrorMsg(null);
     if (!email.trim() || !password) {
-      Alert.alert('Missing info', 'Enter your email and password.');
+      setErrorMsg('Enter your email and password.');
       return;
     }
     setSubmitting(true);
@@ -26,7 +28,7 @@ export default function LoginScreen() {
     });
     setSubmitting(false);
     if (error) {
-      Alert.alert('Sign in failed', error.message);
+      setErrorMsg(error.message);
       return;
     }
     router.replace('/(app)');
@@ -43,10 +45,16 @@ export default function LoginScreen() {
         </View>
 
         <View style={styles.form}>
+          {errorMsg && (
+            <View style={styles.errorBanner}>
+              <ThemedText type="small" style={styles.errorText}>{errorMsg}</ThemedText>
+            </View>
+          )}
+
           <ThemedText type="small" style={styles.label}>Email</ThemedText>
           <TextInput
             value={email}
-            onChangeText={setEmail}
+            onChangeText={(v) => { setErrorMsg(null); setEmail(v); }}
             autoCapitalize="none"
             autoComplete="email"
             keyboardType="email-address"
@@ -58,7 +66,7 @@ export default function LoginScreen() {
           <ThemedText type="small" style={styles.label}>Password</ThemedText>
           <TextInput
             value={password}
-            onChangeText={setPassword}
+            onChangeText={(v) => { setErrorMsg(null); setPassword(v); }}
             autoCapitalize="none"
             autoComplete="current-password"
             secureTextEntry
@@ -121,4 +129,12 @@ const styles = StyleSheet.create({
   footerRow: { flexDirection: 'row', justifyContent: 'center', gap: Spacing.two, marginTop: Spacing.three },
   footerText: { opacity: 0.6 },
   link: { fontWeight: '700', textDecorationLine: 'underline' },
+  errorBanner: {
+    backgroundColor: '#fef2f2',
+    borderColor: '#fecaca',
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: Spacing.three,
+  },
+  errorText: { color: '#991b1b', fontWeight: '600' },
 });
