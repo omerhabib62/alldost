@@ -1,72 +1,81 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useEffect, useState } from 'react';
 
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+import { supabase } from '@/lib/supabase';
+import { useSession } from '@/hooks/useSession';
 
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
-  return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
-  );
-}
-
+/**
+ * Sprint 11 seed screen — ALLDost first-run landing.
+ * Verifies:
+ *  - Expo Router renders
+ *  - Supabase client reachable (auth.getSession() returns without error)
+ *  - Session hook subscribes correctly
+ *
+ * Sprint 12 will replace this with the real onboarding flow.
+ */
 export default function HomeScreen() {
+  const { session, isLoading } = useSession();
+  const [supabaseStatus, setSupabaseStatus] = useState<'checking' | 'ok' | 'fail'>('checking');
+
+  useEffect(() => {
+    supabase.auth.getSession()
+      .then(() => setSupabaseStatus('ok'))
+      .catch(() => setSupabaseStatus('fail'));
+  }, []);
+
   return (
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
+        <View style={styles.heroSection}>
           <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
+            ALLDost
           </ThemedText>
+          <ThemedText type="small" style={styles.subtitle}>
+            Active Lifestyle Lover — Dost
+          </ThemedText>
+          <ThemedText type="small" style={styles.tagline}>
+            The social platform for active Pakistanis. Cricket · Futsal · Gym · Running.
+          </ThemedText>
+        </View>
+
+        <ThemedView type="backgroundElement" style={styles.statusCard}>
+          <StatusRow label="Expo Router" value="✓ Live" ok />
+          <StatusRow
+            label="Supabase"
+            value={supabaseStatus === 'checking' ? '…' : supabaseStatus === 'ok' ? '✓ Connected' : '✗ Fail'}
+            ok={supabaseStatus === 'ok'}
+          />
+          <StatusRow
+            label="Session"
+            value={isLoading ? '…' : session ? `✓ ${session.user.email}` : '✗ Not signed in'}
+            ok={!isLoading && !!session}
+          />
+          <StatusRow label="Platform" value={Platform.OS} ok />
         </ThemedView>
 
-        <ThemedText type="code" style={styles.code}>
-          get started
+        <ThemedText type="small" style={styles.footnote}>
+          Sprint 11 seed · v0.0.1 · 03 Jul 2026
         </ThemedText>
-
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
-
-        {Platform.OS === 'web' && <WebBadge />}
       </SafeAreaView>
     </ThemedView>
   );
 }
 
+function StatusRow({ label, value, ok }: { label: string; value: string; ok: boolean }) {
+  return (
+    <View style={styles.row}>
+      <ThemedText type="small" style={styles.rowLabel}>{label}</ThemedText>
+      <ThemedText type="small" style={ok ? styles.rowValueOk : styles.rowValueBad}>{value}</ThemedText>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    flexDirection: 'row',
-  },
+  container: { flex: 1, justifyContent: 'center', flexDirection: 'row' },
   safeArea: {
     flex: 1,
     paddingHorizontal: Spacing.four,
@@ -80,19 +89,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flex: 1,
     paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
+    gap: Spacing.two,
   },
-  title: {
-    textAlign: 'center',
-  },
-  code: {
-    textTransform: 'uppercase',
-  },
-  stepContainer: {
-    gap: Spacing.three,
+  title: { textAlign: 'center', fontSize: 40, fontWeight: '900', letterSpacing: -1 },
+  subtitle: { textAlign: 'center', opacity: 0.6, textTransform: 'uppercase', letterSpacing: 2 },
+  tagline: { textAlign: 'center', marginTop: Spacing.two, opacity: 0.85 },
+  statusCard: {
+    gap: Spacing.two,
     alignSelf: 'stretch',
     paddingHorizontal: Spacing.three,
     paddingVertical: Spacing.four,
     borderRadius: Spacing.four,
   },
+  row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  rowLabel: { opacity: 0.7 },
+  rowValueOk: { fontWeight: '700', color: '#10b981' },
+  rowValueBad: { fontWeight: '700', color: '#ef4444' },
+  footnote: { opacity: 0.4, marginBottom: Spacing.two },
 });
