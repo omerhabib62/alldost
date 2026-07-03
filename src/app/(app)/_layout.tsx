@@ -45,7 +45,7 @@ export default function AppLayout() {
       />
       <Tabs.Screen
         name="me"
-        options={{ title: 'Me', tabBarIcon: () => <TabEmoji emoji="👤" /> }}
+        options={{ title: 'Profile', tabBarIcon: () => <TabEmoji emoji="👤" /> }}
       />
     </Tabs>
   );
