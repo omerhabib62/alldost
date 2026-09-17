@@ -9,7 +9,7 @@
  * gender, units, timezone, role, needs_onboarding.
  */
 
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { useSession } from '@/hooks/useSession';
 
@@ -52,5 +52,45 @@ export function useProfile() {
       if (error) throw error;
       return data as Profile | null;
     },
+  });
+}
+
+export type ProfileInput = {
+  name: string;
+  dob: string;
+  gender: 'male' | 'female' | 'other' | 'prefer_not_to_say';
+  height_cm: number;
+  start_weight: number;
+  target_weight: number;
+  daily_cal_target: number;
+  protein_active: number;
+  protein_rest: number;
+  macro_p_pct: number;
+  macro_c_pct: number;
+  macro_f_pct: number;
+  goal: 'fat_loss' | 'recomp' | 'bulk';
+  activity_level: number;
+  units: 'metric' | 'imperial';
+  timezone: string;
+};
+
+/**
+ * Onboarding save — same write as the web app's useEnsureProfile: upsert the
+ * profiles row and clear needs_onboarding (closes the admin reset loop).
+ */
+export function useSaveProfile() {
+  const { session } = useSession();
+  const userId = session?.user?.id;
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (profile: ProfileInput) => {
+      if (!userId) throw new Error('User session not found.');
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({ id: userId, needs_onboarding: false, ...profile });
+      if (error) throw error;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['profile'] }),
   });
 }

@@ -1,9 +1,8 @@
 import { Stack } from 'expo-router';
 
 /**
- * Onboarding flow — 3 steps. Sprint 12 will wire them to backend calls
- * (upsert profile, insert into user_sports, join/create squad).
- * For Sprint 11 seed these are placeholders that route correctly.
+ * Onboarding flow. `profile` holds the 3 saving steps (bio, goal, targets →
+ * profiles upsert). `sports` and `crew` follow as not-yet-persisted previews.
  */
 export default function OnboardingLayout() {
   return (
