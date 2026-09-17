@@ -13,11 +13,15 @@
  */
 
 import { View, Text, Pressable } from 'react-native';
-import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import { useRouter } from 'expo-router';
+import type { ComponentProps } from 'react';
+import { Tabs, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import AppLogo from '@/components/AppLogo';
+
+// expo-router vendors react-navigation and doesn't export BottomTabBarProps,
+// so take the props type from Tabs' own tabBar prop.
+type BottomTabBarProps = Parameters<NonNullable<ComponentProps<typeof Tabs>['tabBar']>>[0];
 
 const ACTIVE_COLOR = '#0a66c2';
 const INACTIVE_COLOR = '#9ca3af';
@@ -62,7 +66,7 @@ function TabButton({
   descriptors,
   navigation,
   routeIndex,
-}: BottomTabBarProps & { routeIndex: number }) {
+}: Pick<BottomTabBarProps, 'state' | 'descriptors' | 'navigation'> & { routeIndex: number }) {
   const route = state.routes[routeIndex];
   if (!route) return <View className="flex-1" />;
 

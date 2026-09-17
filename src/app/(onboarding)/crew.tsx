@@ -1,10 +1,6 @@
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Spacing } from '@/constants/theme';
 
 /**
  * Sprint 11 STUB — Step 3 of onboarding. CREW-FIRST is the ALLDost thesis:
@@ -21,57 +17,34 @@ export default function OnboardingCrewScreen() {
   };
 
   return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <View style={styles.top}>
-          <ThemedText type="small" style={styles.step}>Step 3 of 3</ThemedText>
-          <ThemedText type="title" style={styles.title}>Bring your crew</ThemedText>
-          <ThemedText type="small" style={styles.sub}>
-            ALLDost is designed for crews. Join an existing one with a code, or start yours.
-          </ThemedText>
-        </View>
+    <SafeAreaView className="flex-1 bg-background px-6 justify-between pb-16">
+      <View className="pt-16 gap-2">
+        <Text className="text-sm font-medium text-muted-foreground uppercase tracking-[2px]">Step 3 of 3</Text>
+        <Text className="text-[28px] leading-[52px] font-black text-foreground">Bring your crew</Text>
+        <Text className="text-sm font-medium text-muted-foreground">
+          ALLDost is designed for crews. Join an existing one with a code, or start yours.
+        </Text>
+      </View>
 
-        <View style={styles.options}>
-          <Pressable style={styles.option} onPress={finish}>
-            <ThemedText type="small" style={styles.optionTitle}>Join with a code</ThemedText>
-            <ThemedText type="small" style={styles.optionSub}>
-              Got a 6-character code from a friend? Enter it here. (Sprint 12)
-            </ThemedText>
-          </Pressable>
+      <View className="gap-4">
+        <Pressable className="p-6 rounded-2xl border-[1.5px] border-gray-200 bg-gray-50 gap-1.5" onPress={finish}>
+          <Text className="text-base font-extrabold text-foreground">Join with a code</Text>
+          <Text className="text-sm font-medium text-muted-foreground">
+            Got a 6-character code from a friend? Enter it here. (Sprint 12)
+          </Text>
+        </Pressable>
 
-          <Pressable style={styles.option} onPress={finish}>
-            <ThemedText type="small" style={styles.optionTitle}>Create a crew</ThemedText>
-            <ThemedText type="small" style={styles.optionSub}>
-              Start one for your maidan group, gym buddies, or cricket team. (Sprint 12)
-            </ThemedText>
-          </Pressable>
+        <Pressable className="p-6 rounded-2xl border-[1.5px] border-gray-200 bg-gray-50 gap-1.5" onPress={finish}>
+          <Text className="text-base font-extrabold text-foreground">Create a crew</Text>
+          <Text className="text-sm font-medium text-muted-foreground">
+            Start one for your maidan group, gym buddies, or cricket team. (Sprint 12)
+          </Text>
+        </Pressable>
 
-          <Pressable onPress={finish}>
-            <ThemedText type="small" style={styles.skip}>Skip for now →</ThemedText>
-          </Pressable>
-        </View>
-      </SafeAreaView>
-    </ThemedView>
+        <Pressable onPress={finish}>
+          <Text className="text-sm text-center font-bold text-muted-foreground py-2">Skip for now →</Text>
+        </Pressable>
+      </View>
+    </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  safeArea: { flex: 1, paddingHorizontal: Spacing.four, justifyContent: 'space-between', paddingBottom: Spacing.six },
-  top: { paddingTop: Spacing.six, gap: Spacing.two },
-  step: { opacity: 0.5, textTransform: 'uppercase', letterSpacing: 2 },
-  title: { fontSize: 28, fontWeight: '900' },
-  sub: { opacity: 0.6 },
-  options: { gap: Spacing.three },
-  option: {
-    padding: Spacing.four,
-    borderRadius: 16,
-    borderWidth: 1.5,
-    borderColor: '#e5e7eb',
-    backgroundColor: '#f9fafb',
-    gap: 6,
-  },
-  optionTitle: { fontWeight: '800', fontSize: 16 },
-  optionSub: { opacity: 0.65 },
-  skip: { textAlign: 'center', opacity: 0.6, fontWeight: '700', paddingVertical: Spacing.two },
-});

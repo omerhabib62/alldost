@@ -1,12 +1,9 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { Pressable, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, useRouter } from 'expo-router';
 
 import AppLogo from '@/components/AppLogo';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Spacing } from '@/constants/theme';
 import { supabase } from '@/lib/supabase';
 
 export default function LoginScreen() {
@@ -36,107 +33,65 @@ export default function LoginScreen() {
   };
 
   return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <View style={styles.hero}>
-          <AppLogo size={64} />
-          <ThemedText type="title" style={styles.brand}>ALLDost</ThemedText>
-          <ThemedText type="small" style={styles.tag}>
-            Log your matches, PRs, workouts. Share with your crew.
-          </ThemedText>
-        </View>
+    <SafeAreaView className="flex-1 bg-background px-6 justify-center gap-16">
+      <View className="items-center gap-2">
+        <AppLogo size={64} />
+        <Text className="text-[40px] leading-[52px] font-black tracking-[-1px] text-foreground">ALLDost</Text>
+        <Text className="text-sm font-medium text-muted-foreground text-center max-w-[300px]">
+          Log your matches, PRs, workouts. Share with your crew.
+        </Text>
+      </View>
 
-        <View style={styles.form}>
-          {errorMsg && (
-            <View style={styles.errorBanner}>
-              <ThemedText type="small" style={styles.errorText}>{errorMsg}</ThemedText>
-            </View>
-          )}
-
-          <ThemedText type="small" style={styles.label}>Email</ThemedText>
-          <TextInput
-            value={email}
-            onChangeText={(v) => { setErrorMsg(null); setEmail(v); }}
-            autoCapitalize="none"
-            autoComplete="email"
-            keyboardType="email-address"
-            placeholder="you@example.com"
-            placeholderTextColor="#9ca3af"
-            style={styles.input}
-          />
-
-          <ThemedText type="small" style={styles.label}>Password</ThemedText>
-          <TextInput
-            value={password}
-            onChangeText={(v) => { setErrorMsg(null); setPassword(v); }}
-            autoCapitalize="none"
-            autoComplete="current-password"
-            secureTextEntry
-            placeholder="••••••••"
-            placeholderTextColor="#9ca3af"
-            style={styles.input}
-          />
-
-          <Pressable
-            onPress={onSubmit}
-            disabled={submitting}
-            style={[styles.button, submitting && styles.buttonDisabled]}
-          >
-            <ThemedText type="small" style={styles.buttonText}>
-              {submitting ? 'Signing in…' : 'Sign in'}
-            </ThemedText>
-          </Pressable>
-
-          <View style={styles.footerRow}>
-            <ThemedText type="small" style={styles.footerText}>New here?</ThemedText>
-            <Link href="/(auth)/signup" asChild>
-              <Pressable>
-                <ThemedText type="small" style={styles.link}>Create an account</ThemedText>
-              </Pressable>
-            </Link>
+      <View className="gap-2 max-w-[400px] w-full self-center">
+        {errorMsg && (
+          <View className="bg-red-50 border border-red-200 rounded-xl p-4">
+            <Text className="text-sm font-semibold text-red-800">{errorMsg}</Text>
           </View>
+        )}
+
+        <Text className="text-sm font-medium text-muted-foreground mt-2 mb-0.5">Email</Text>
+        <TextInput
+          value={email}
+          onChangeText={(v) => { setErrorMsg(null); setEmail(v); }}
+          autoCapitalize="none"
+          autoComplete="email"
+          keyboardType="email-address"
+          placeholder="you@example.com"
+          placeholderTextColor="#9ca3af"
+          className="border border-gray-200 rounded-xl px-4 py-2 text-[15px] text-gray-900 bg-gray-50"
+        />
+
+        <Text className="text-sm font-medium text-muted-foreground mt-2 mb-0.5">Password</Text>
+        <TextInput
+          value={password}
+          onChangeText={(v) => { setErrorMsg(null); setPassword(v); }}
+          autoCapitalize="none"
+          autoComplete="current-password"
+          secureTextEntry
+          placeholder="••••••••"
+          placeholderTextColor="#9ca3af"
+          className="border border-gray-200 rounded-xl px-4 py-2 text-[15px] text-gray-900 bg-gray-50"
+        />
+
+        <Pressable
+          onPress={onSubmit}
+          disabled={submitting}
+          className={`mt-4 bg-slate-900 rounded-xl py-4 items-center ${submitting ? 'opacity-50' : ''}`}
+        >
+          <Text className="text-sm font-extrabold tracking-[0.5px] text-white">
+            {submitting ? 'Signing in…' : 'Sign in'}
+          </Text>
+        </Pressable>
+
+        <View className="flex-row justify-center gap-2 mt-4">
+          <Text className="text-sm font-medium text-muted-foreground">New here?</Text>
+          <Link href="/(auth)/signup" asChild>
+            <Pressable>
+              <Text className="text-sm font-bold underline text-foreground">Create an account</Text>
+            </Pressable>
+          </Link>
         </View>
-      </SafeAreaView>
-    </ThemedView>
+      </View>
+    </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  safeArea: { flex: 1, paddingHorizontal: Spacing.four, justifyContent: 'center', gap: Spacing.six },
-  hero: { alignItems: 'center', gap: Spacing.two },
-  brand: { fontSize: 40, fontWeight: '900', letterSpacing: -1 },
-  tag: { opacity: 0.7, textAlign: 'center', maxWidth: 300 },
-  form: { gap: Spacing.two, maxWidth: 400, width: '100%', alignSelf: 'center' },
-  label: { opacity: 0.7, marginBottom: 2, marginTop: Spacing.two },
-  input: {
-    borderWidth: 1,
-    borderColor: '#e5e7eb',
-    borderRadius: 12,
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.two,
-    fontSize: 15,
-    color: '#111827',
-    backgroundColor: '#f9fafb',
-  },
-  button: {
-    marginTop: Spacing.three,
-    backgroundColor: '#0f172a',
-    borderRadius: 12,
-    paddingVertical: Spacing.three,
-    alignItems: 'center',
-  },
-  buttonDisabled: { opacity: 0.5 },
-  buttonText: { color: 'white', fontWeight: '800', letterSpacing: 0.5 },
-  footerRow: { flexDirection: 'row', justifyContent: 'center', gap: Spacing.two, marginTop: Spacing.three },
-  footerText: { opacity: 0.6 },
-  link: { fontWeight: '700', textDecorationLine: 'underline' },
-  errorBanner: {
-    backgroundColor: '#fef2f2',
-    borderColor: '#fecaca',
-    borderWidth: 1,
-    borderRadius: 12,
-    padding: Spacing.three,
-  },
-  errorText: { color: '#991b1b', fontWeight: '600' },
-});

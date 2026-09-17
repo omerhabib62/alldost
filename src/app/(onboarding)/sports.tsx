@@ -1,11 +1,7 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Spacing } from '@/constants/theme';
 
 /**
  * Sprint 11 STUB — Step 2 of onboarding.
@@ -37,79 +33,43 @@ export default function OnboardingSportsScreen() {
   const canContinue = selected.size >= 1;
 
   return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <View style={styles.top}>
-          <ThemedText type="small" style={styles.step}>Step 2 of 3</ThemedText>
-          <ThemedText type="title" style={styles.title}>What sports do you do?</ThemedText>
-          <ThemedText type="small" style={styles.sub}>
-            Pick at least one. You can add more later.
-          </ThemedText>
-        </View>
+    <SafeAreaView className="flex-1 bg-background px-6 justify-between pb-16">
+      <View className="pt-16 gap-2">
+        <Text className="text-sm font-medium text-muted-foreground uppercase tracking-[2px]">Step 2 of 3</Text>
+        <Text className="text-[28px] leading-[52px] font-black text-foreground">What sports do you do?</Text>
+        <Text className="text-sm font-medium text-muted-foreground">
+          Pick at least one. You can add more later.
+        </Text>
+      </View>
 
-        <View style={styles.list}>
-          {LAUNCH_SPORTS.map((s) => {
-            const isOn = selected.has(s.key);
-            return (
-              <Pressable
-                key={s.key}
-                onPress={() => toggle(s.key)}
-                style={[styles.card, isOn && styles.cardOn]}
-              >
-                <ThemedText type="small" style={styles.emoji}>{s.emoji}</ThemedText>
-                <ThemedText type="small" style={styles.label}>{s.label}</ThemedText>
-                <ThemedText type="small" style={styles.check}>{isOn ? '✓' : ''}</ThemedText>
-              </Pressable>
-            );
-          })}
-        </View>
+      <View className="gap-2">
+        {LAUNCH_SPORTS.map((s) => {
+          const isOn = selected.has(s.key);
+          return (
+            <Pressable
+              key={s.key}
+              onPress={() => toggle(s.key)}
+              className={`flex-row items-center gap-4 py-4 px-6 rounded-[14px] border-[1.5px] ${
+                isOn ? 'border-slate-900 bg-indigo-50' : 'border-gray-200 bg-gray-50'
+              }`}
+            >
+              <Text className="text-[22px]">{s.emoji}</Text>
+              <Text className="flex-1 text-sm font-bold text-foreground">{s.label}</Text>
+              <Text className="text-sm font-black text-slate-900">{isOn ? '✓' : ''}</Text>
+            </Pressable>
+          );
+        })}
+      </View>
 
-        <Pressable
-          onPress={() => canContinue && router.push('/(onboarding)/crew')}
-          style={[styles.next, !canContinue && styles.nextDisabled]}
-          disabled={!canContinue}
-        >
-          <ThemedText type="small" style={styles.nextText}>
-            {canContinue ? 'Next: join or create your crew →' : 'Pick at least one sport'}
-          </ThemedText>
-        </Pressable>
-      </SafeAreaView>
-    </ThemedView>
+      <Pressable
+        onPress={() => canContinue && router.push('/(onboarding)/crew')}
+        className={`bg-slate-900 rounded-xl py-4 items-center ${canContinue ? '' : 'opacity-35'}`}
+        disabled={!canContinue}
+      >
+        <Text className="text-sm font-extrabold text-white">
+          {canContinue ? 'Next: join or create your crew →' : 'Pick at least one sport'}
+        </Text>
+      </Pressable>
+    </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  safeArea: {
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    justifyContent: 'space-between',
-    paddingBottom: Spacing.six,
-  },
-  top: { paddingTop: Spacing.six, gap: Spacing.two },
-  step: { opacity: 0.5, textTransform: 'uppercase', letterSpacing: 2 },
-  title: { fontSize: 28, fontWeight: '900' },
-  sub: { opacity: 0.6 },
-  list: { gap: Spacing.two },
-  card: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.three,
-    paddingVertical: Spacing.three,
-    paddingHorizontal: Spacing.four,
-    borderRadius: 14,
-    borderWidth: 1.5,
-    borderColor: '#e5e7eb',
-    backgroundColor: '#f9fafb',
-  },
-  cardOn: {
-    borderColor: '#0f172a',
-    backgroundColor: '#eef2ff',
-  },
-  emoji: { fontSize: 22 },
-  label: { flex: 1, fontWeight: '700' },
-  check: { fontWeight: '900', color: '#0f172a' },
-  next: { backgroundColor: '#0f172a', borderRadius: 12, paddingVertical: Spacing.three, alignItems: 'center' },
-  nextDisabled: { opacity: 0.35 },
-  nextText: { color: 'white', fontWeight: '800' },
-});
