@@ -1,6 +1,6 @@
 # Project rules
 
-1. **NEVER add a `Co-Authored-By: Claude` trailer to any commit.** Hard rule.
+1. **NEVER add Claude attribution.** No `Co-Authored-By: Claude` trailer on any commit, and no "Generated with Claude Code" footer or other Claude attribution in PR titles or descriptions. Hard rule.
 2. Never commit directly to `master`. Branch, then open a PR.
 3. No invented numbers. Every figure in a commit message, report or document comes from a command that actually ran.
 4. No secrets in code, logs or transcripts. `EXPO_PUBLIC_*` values ship to the client.
