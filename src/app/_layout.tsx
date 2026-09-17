@@ -9,42 +9,53 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { runApiLogProbe } from '@/lib/api';
 import { queryClient } from '@/lib/queryClient';
 import { useSession } from '@/hooks/useSession';
+import { useProfile } from '@/hooks/useProfile';
 
 SplashScreen.preventAutoHideAsync();
 
 /**
  * Route protection.
- *  - Not signed in + not in (auth) → redirect to /login
- *  - Signed in + in (auth) → redirect to /(app)
+ *  - Not signed in + not in (auth) → /login
+ *  - Signed in, no profile row or needs_onboarding=TRUE → /(onboarding)/profile
+ *    (same rule as the web dashboard; /api/log 404s without a profile row)
+ *  - Signed in + onboarded + in (auth) → /(app)
  *
- * Onboarding gating (profile + crew completion) is added in Sprint 12 once
- * profile + crew tables/queries are wired. For now, signed-in users go
- * straight to (app).
+ * Onboarded users are not bounced out of (onboarding): the profile is saved
+ * at the end of step 3, and the Sports/Crew screens come after it.
+ * If the profile query errors (e.g. offline) we don't redirect — sending an
+ * onboarded user to the form would risk overwriting their targets.
  */
-function useProtectedRoute(sessionReady: boolean, isSignedIn: boolean) {
+function useProtectedRoute() {
   const segments = useSegments();
   const router = useRouter();
+  const { session, isLoading: sessionLoading } = useSession();
+  const { data: profile, isPending: profilePending, isError: profileError } = useProfile();
+
+  const isSignedIn = !!session;
+  const ready = !sessionLoading && (!isSignedIn || !profilePending || profileError);
 
   useEffect(() => {
-    if (!sessionReady) return;
+    if (!ready) return;
 
-    const inAuthGroup = segments[0] === '(auth)';
+    const group = segments[0];
+    const needsOnboarding = profile === null || profile?.needs_onboarding === true;
 
-    if (!isSignedIn && !inAuthGroup) {
-      router.replace('/(auth)/login');
-    } else if (isSignedIn && inAuthGroup) {
+    if (!isSignedIn) {
+      if (group !== '(auth)') router.replace('/(auth)/login');
+    } else if (needsOnboarding) {
+      if (group !== '(onboarding)') router.replace('/(onboarding)/profile');
+    } else if (group === '(auth)') {
       router.replace('/(app)');
     }
-  }, [sessionReady, isSignedIn, segments, router]);
+  }, [ready, isSignedIn, profile, segments, router]);
+
+  return { ready, userId: session?.user?.id };
 }
 
-export default function RootLayout() {
+function RootNavigator() {
   const colorScheme = useColorScheme();
-  const { session, isLoading } = useSession();
+  const { ready, userId } = useProtectedRoute();
 
-  useProtectedRoute(!isLoading, !!session);
-
-  const userId = session?.user?.id;
   useEffect(() => {
     if (__DEV__ && process.env.EXPO_PUBLIC_API_PROBE === '1' && userId) {
       runApiLogProbe();
@@ -52,20 +63,27 @@ export default function RootLayout() {
   }, [userId]);
 
   useEffect(() => {
-    if (!isLoading) {
+    if (ready) {
       SplashScreen.hideAsync().catch(() => {});
     }
-  }, [isLoading]);
+  }, [ready]);
 
   return (
+    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(auth)" options={{ animation: 'fade' }} />
+        <Stack.Screen name="(onboarding)" options={{ animation: 'fade' }} />
+        <Stack.Screen name="(app)" options={{ animation: 'fade' }} />
+      </Stack>
+    </ThemeProvider>
+  );
+}
+
+export default function RootLayout() {
+  // useProfile needs the QueryClient, so route protection lives one level down.
+  return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(auth)" options={{ animation: 'fade' }} />
-          <Stack.Screen name="(onboarding)" options={{ animation: 'fade' }} />
-          <Stack.Screen name="(app)" options={{ animation: 'fade' }} />
-        </Stack>
-      </ThemeProvider>
+      <RootNavigator />
     </QueryClientProvider>
   );
 }

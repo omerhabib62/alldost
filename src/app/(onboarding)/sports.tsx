@@ -4,8 +4,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 
 /**
- * Sprint 11 STUB — Step 2 of onboarding.
- * Sprint 12 wires: user_sports insert with selected sports as primary + secondary.
+ * Onboarding extra (after the profile is saved). NOT PERSISTED: there is no
+ * user_sports table in fitness/supabase/migrations yet, so picks are only
+ * held in screen state and the UI says so.
  *
  * 4 launch sports locked per ALLDost positioning doc.
  */
@@ -30,15 +31,13 @@ export default function OnboardingSportsScreen() {
     });
   };
 
-  const canContinue = selected.size >= 1;
-
   return (
     <SafeAreaView className="flex-1 bg-background px-6 justify-between pb-16">
       <View className="pt-16 gap-2">
-        <Text className="text-sm font-medium text-muted-foreground uppercase tracking-[2px]">Step 2 of 3</Text>
+        <Text className="text-sm font-medium text-muted-foreground uppercase tracking-[2px]">Optional · not saved yet</Text>
         <Text className="text-[28px] leading-[52px] font-black text-foreground">What sports do you do?</Text>
         <Text className="text-sm font-medium text-muted-foreground">
-          Pick at least one. You can add more later.
+          Coming soon. Your picks aren't saved yet — this step just previews what's next.
         </Text>
       </View>
 
@@ -62,13 +61,10 @@ export default function OnboardingSportsScreen() {
       </View>
 
       <Pressable
-        onPress={() => canContinue && router.push('/(onboarding)/crew')}
-        className={`bg-slate-900 rounded-xl py-4 items-center ${canContinue ? '' : 'opacity-35'}`}
-        disabled={!canContinue}
+        onPress={() => router.push('/(onboarding)/crew')}
+        className="bg-slate-900 rounded-xl py-4 items-center"
       >
-        <Text className="text-sm font-extrabold text-white">
-          {canContinue ? 'Next: join or create your crew →' : 'Pick at least one sport'}
-        </Text>
+        <Text className="text-sm font-extrabold text-white">Next: crews →</Text>
       </Pressable>
     </SafeAreaView>
   );
