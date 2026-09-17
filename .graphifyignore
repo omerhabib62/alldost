@@ -1,0 +1,6 @@
+# graphify scope: application code only.
+# Whitelist form (gitignore syntax): ignore every top-level entry, then re-include
+# src/. Keeps `graphify update .` scoped so the graph does not regrow scripts/,
+# dist/, .expo/, assets/ and root config files.
+/*
+!/src/

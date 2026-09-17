@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useColorScheme } from 'react-native';
 import { QueryClientProvider } from '@tanstack/react-query';
 
+import { runApiLogProbe } from '@/lib/api';
 import { queryClient } from '@/lib/queryClient';
 import { useSession } from '@/hooks/useSession';
 
@@ -40,6 +41,13 @@ export default function RootLayout() {
   const { session, isLoading } = useSession();
 
   useProtectedRoute(!isLoading, !!session);
+
+  const userId = session?.user?.id;
+  useEffect(() => {
+    if (__DEV__ && process.env.EXPO_PUBLIC_API_PROBE === '1' && userId) {
+      runApiLogProbe();
+    }
+  }, [userId]);
 
   useEffect(() => {
     if (!isLoading) {
